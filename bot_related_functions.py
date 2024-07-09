@@ -4,7 +4,7 @@ import browse_web
 def new_day():
     file_date = 0
     created = True
-    today = datetime.datetime.now().strftime('%Y-%m-%d')
+    today = datetime.datetime.now(datetime.UTC).strftime('%Y-%m-%d')
     
     try:
         with open('daily date.txt', 'r') as f:
