@@ -48,3 +48,39 @@ def get_subscribed_channel_id():
     except FileNotFoundError:
         print("No such file")
     return id
+
+def notify_time():
+    now = datetime.datetime.now()
+    clock = now.strftime("%H:%M:%S")
+    notify_time = "18:00:00"
+    
+    # monday os 0 and sunday is 6
+    # notify on weekends only
+    if now.weekday() < 5:
+        return False
+    if clock == notify_time:
+        return True
+    else:
+        return False
+    
+def members_to_notify():
+    members = []
+    with open('notify.txt', 'r') as f:
+        for line in f:
+            members.append(line.strip())
+    return members
+
+def get_notify_channel(channel: int):
+    id = 0
+    try:
+        with open("channels.txt", 'r') as f:
+            lines = f.readlines()
+            if 0 <= channel < len(lines):
+                print(lines[channel])
+                return int(lines[channel])
+            else:
+                print("Error: Channel to notify doesn't exist")
+                return id
+    except FileNotFoundError:
+        print("No such file to notify")
+    return id

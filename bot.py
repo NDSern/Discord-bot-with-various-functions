@@ -4,6 +4,9 @@ import os
 from dotenv import load_dotenv
 import bot_related_functions
 import asyncio
+from datetime import datetime
+
+start = datetime.now()
 
 load_dotenv()
 DISCORD_TOKEN = os.getenv('DISCORD_TOKEN')
@@ -13,6 +16,7 @@ translator = deepl.Translator(DEEPL_KEY)
 
 intents = discord.Intents.default()
 intents.message_content = True
+intents.members = True
 
 client = discord.Client(intents=intents)
 
@@ -32,7 +36,21 @@ async def on_ready():
             else:
                 print(f"Channel with ID {channel_id} not found.")
         
-        print("a minute has passed")        
+        if bot_related_functions.notify_time():
+            members = bot_related_functions.members_to_notify()
+            channel_id = bot_related_functions.get_notify_channel(0)
+            channel = client.get_channel(channel_id)
+            
+            if channel:
+                notify_message = "It's time to Co-op "
+                for i in members:
+                    notify_message += "<@" + str(i.id) + "> "
+                await channel.send(notify_message)
+                print("Notified")
+            else:
+                print("Channel to notify doesn't exist")
+                
+        print("The bot has been up for: ", datetime.now() - start) 
         
         await asyncio.sleep(60)
 
@@ -61,5 +79,17 @@ async def on_message(message):
         subscribed_channel_id = message.channel.id
         bot_related_functions.leetcode_daily_subscribed(subscribed_channel_id)
         await message.channel.send("Channel subscribed")
+        
+    if message.content.startswith("/getmembers"):
+        guild = message.channel.guild
+        members = ""
+        for i in guild.members:
+            members += "\n"
+            members += str(i.name)
+            members += ": "
+            members += str(i.id)
+            members += "\n"
+        smessage = "There are " + str(guild.member_count) + ". They are: " + members
+        await message.channel.send(smessage)
 
 client.run(DISCORD_TOKEN)

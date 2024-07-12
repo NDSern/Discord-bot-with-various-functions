@@ -4,7 +4,7 @@ from selenium.webdriver.common.by import By
 import time
 
 def capture_daily():
-    driver = webdriver.Chrome()
+    driver = webdriver.Firefox()
     driver.get("https://leetcode.com/problemset/")
 
     time.sleep(5)
