@@ -44,13 +44,13 @@ async def on_ready():
             if channel:
                 notify_message = "It's time to Co-op "
                 for i in members:
-                    notify_message += "<@" + str(i.id) + "> "
+                    notify_message += "<@" + str(i) + "> "
                 await channel.send(notify_message)
                 print("Notified")
             else:
                 print("Channel to notify doesn't exist")
                 
-        print("The bot has been up for: ", datetime.now() - start) 
+        print("The bot is running, the time is: ", datetime.now()) 
         
         await asyncio.sleep(60)
 
@@ -80,6 +80,20 @@ async def on_message(message):
         bot_related_functions.leetcode_daily_subscribed(subscribed_channel_id)
         await message.channel.send("Channel subscribed")
         
+    if message.content.startswith("/notifynow"):
+        members = bot_related_functions.members_to_notify()
+        channel_id = bot_related_functions.get_notify_channel(0)
+        channel = client.get_channel(channel_id)
+        
+        if channel:
+            notify_message = "It's time to Co-op "
+            for i in members:
+                notify_message += "<@" + str(i) + "> "
+            await channel.send(notify_message)
+            print("Notified")
+        else:
+            print("Channel to notify doesn't exist")
+            
     if message.content.startswith("/getmembers"):
         guild = message.channel.guild
         members = ""

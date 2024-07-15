@@ -51,14 +51,18 @@ def get_subscribed_channel_id():
 
 def notify_time():
     now = datetime.datetime.now()
-    clock = now.strftime("%H:%M:%S")
-    notify_time = "18:00:00"
+    curr_hour = now.hour
+    curr_minute = now.minute
+    curr_second = now.second
+    
+    curr_time = datetime.time(curr_hour, curr_minute)
+    notify_time = datetime.time(18, 00)
     
     # monday os 0 and sunday is 6
     # notify on weekends only
     if now.weekday() < 5:
         return False
-    if clock == notify_time:
+    if curr_time == notify_time:
         return True
     else:
         return False
