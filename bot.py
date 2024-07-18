@@ -63,7 +63,7 @@ async def on_message(message):
         return
 
     if message.content.startswith('/translate'):
-        need_translation_message = message.content[6:]
+        need_translation_message = message.content[10:]
         translated_message = translator.translate_text(need_translation_message, target_lang="EN-GB")
         await message.channel.send(translated_message.text)
         
