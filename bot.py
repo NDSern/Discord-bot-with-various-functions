@@ -130,7 +130,7 @@ async def on_message(message):
         commands += "**/past**: Show the list of things that have been done\n"
         commands += "**/addtd <str>**: Add a new task\n"
         commands += "**/do <int>**: Mark yourself as doing something\n"
-        commands += "**/done <int>**: Mark yourself as completed a task\n"
+        commands += "**/complete <int>**: Mark yourself as completed a task\n"
         await message.channel.send(commands)
     
     if message.content.startswith("/todos"):
@@ -158,13 +158,13 @@ async def on_message(message):
         await message.channel.send(past_list)
     
     if message.content.startswith("/addtd"):
-        todo = message.content[6:]
+        todo = message.content[7:]
         with open("todos.txt", "a") as f:
             f.writelines("\n" + todo)
         await message.channel.send("Todo added.")
     
     if message.content.startswith("/do"):
-        do = int(message.content[3:])
+        do = int(message.content[4:])
         print(do)
         lines = ""
         try:
@@ -176,7 +176,7 @@ async def on_message(message):
         if do < 0 or do > len(lines):
             await message.channel.send("Task not in the list!")
             
-        lines[do-1] = lines[do-1].strip() + " *Doing: " + message.author.name + "*"
+        lines[do-1] = lines[do-1].strip() + " *Doing: " + message.author.name + "*\n"
         
         with open('todos.txt', 'r+') as f:
             f.writelines(lines)

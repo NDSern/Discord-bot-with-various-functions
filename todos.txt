@@ -1,2 +1,8 @@
-make a player make a room make a rat serenereti
-debug rat Doing: serenereti Doing: serenereti
+make main character basic control 
+create debug room
+create a rat box, hurtbox *Doing: serenereti*
+pathfinding for rat *Doing: serenereti*
+collison for pd
+export to html <https://www.youtube.com/watch?v=RiQcnVgBhFE&t=18s>
+add atck animation
+make some tilemap for the maps

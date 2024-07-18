@@ -3,3 +3,5 @@ __pycache__/
 channels.txt
 myenv/
 notify.txt
+done.txt
+todos.txt
