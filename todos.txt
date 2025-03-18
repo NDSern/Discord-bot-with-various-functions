@@ -1,8 +1,12 @@
-make main character basic control 
 create debug room
-create a rat box, hurtbox *Doing: serenereti*
-pathfinding for rat *Doing: serenereti*
 collison for pd
 export to html <https://www.youtube.com/watch?v=RiQcnVgBhFE&t=18s>
 add atck animation
 make some tilemap for the maps
+draw rat
+draw piper
+draw cultist
+create ingame ui
+create start menu screen ui
+endgame screen ui
+more complex pathfinding for rat(tempalte) *Doing: serenereti*

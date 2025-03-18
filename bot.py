@@ -30,7 +30,8 @@ async def on_ready():
             channel = client.get_channel(channel_id)
 
             if channel:
-                bot_related_functions.get_daily_leetcode_screenshot()
+                herf_daily = bot_related_functions.get_daily_leetcode_screenshot()
+                await channel.send(herf_daily)
                 await channel.send(file=discord.File('daily.png'))
                 print(f"Channel with ID {channel_id} has been sent daily challenge")
             else:
