@@ -11,8 +11,9 @@ def capture_daily():
 
     link = driver.find_element(By.CSS_SELECTOR, "a[href*='daily']")
     # print(link.get_attribute('href'))
-
-    driver.get(link.get_attribute('href'))
+    href_value = link.get_attribute('href')
+    
+    driver.get(href_value)
     driver.set_window_size(1200, 2500)
     # driver.maximize_window()
     time.sleep(5)
@@ -20,3 +21,5 @@ def capture_daily():
     element.screenshot('daily.png')
     time.sleep(5)
     driver.close()
+    
+    return href_value

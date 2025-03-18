@@ -23,11 +23,12 @@ def new_day():
 def get_daily_leetcode_screenshot():
     if new_day():
         today = datetime.datetime.now().strftime('%Y-%m-%d')
-        browse_web.capture_daily()
+        herf_value = browse_web.capture_daily()
         with open("daily date.txt", 'w') as f:
             f.writelines(today)
+        return herf_value
     else:
-        return
+        return "No link"
 
 def get_new_daily_leetcode_screenshot():
     today = datetime.datetime.now().strftime('%Y-%m-%d')
@@ -56,7 +57,7 @@ def notify_time():
     curr_second = now.second
     
     curr_time = datetime.time(curr_hour, curr_minute)
-    notify_time = datetime.time(18, 00)
+    notify_time = datetime.time(15, 30)
     
     # monday os 0 and sunday is 6
     # notify on weekends only
