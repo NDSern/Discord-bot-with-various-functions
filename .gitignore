@@ -5,3 +5,4 @@ myenv/
 notify.txt
 done.txt
 todos.txt
+*.png
