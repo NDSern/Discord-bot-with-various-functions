@@ -25,11 +25,12 @@ bot = commands.Bot(command_prefix="/", intents=intents)
 
 RUN_ONCE = False
 async def run_once_on_startup():
+    global RUN_ONCE
     if not RUN_ONCE:
         try:
             await add_cogs()
             synced = await bot.tree.sync()
-            print("Commands synced: " + len(synced))
+            print("Commands synced: " + str(len(synced)))
         except Exception as e:
             print(e)
     RUN_ONCE = True
@@ -37,15 +38,16 @@ async def run_once_on_startup():
 @bot.event
 async def on_ready():
     print(str(bot.user) + " is running!")
-    run_once_on_startup()
+    await run_once_on_startup()
     
 @bot.event
 async def on_message(msg):
     if msg.content == "!!!Sync":
+        global RUN_ONCE
         RUN_ONCE = False
         run_once_on_startup()
 
-@bot.tree.command(description="Auto translate a phrase to English.")
+@bot.tree.command(description="Translate a phrase to English.")
 @discord.app_commands.describe(translate="need translated")
 async def translate(interaction: discord.Interaction, translate: str):
     rawMessage = translate

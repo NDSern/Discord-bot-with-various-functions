@@ -5,7 +5,7 @@ import bot_related_functions
 
 utc = datetime.timezone.utc
 leetcode_time = datetime.time(hour=0, minute=0, tzinfo=utc)
-coop_time = datetime.time(hour=15, minute=30, tzinfo=utc)
+coop_time = datetime.time(hour=13, minute=30, tzinfo=utc)
 
 LEETCODE_CHANNEL = 829060490079895622
 GENERAL_CHANNEL = 826136343021092897
@@ -34,7 +34,7 @@ class DailyCog(commands.Cog):
     @tasks.loop(time=coop_time)
     async def coop_weekends_notice(self):
         if datetime.datetime.now().weekday() < 5:
-            pass
+            return
         
         members = bot_related_functions.members_to_notify()
         channel = self.bot.get_channel(GENERAL_CHANNEL)
