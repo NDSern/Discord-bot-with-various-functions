@@ -2,13 +2,16 @@ import discord
 from discord.ext import tasks, commands
 import datetime
 import bot_related_functions
+import os
+from dotenv import load_dotenv
 
 utc = datetime.timezone.utc
 leetcode_time = datetime.time(hour=0, minute=0, tzinfo=utc)
 coop_time = datetime.time(hour=13, minute=30, tzinfo=utc)
 
-LEETCODE_CHANNEL = 829060490079895622
-GENERAL_CHANNEL = 826136343021092897
+load_dotenv()
+LEETCODE_CHANNEL = os.getenv('LEETCODE_CHANNEL')
+GENERAL_CHANNEL = os.getenv('GENERAL_CHANNEL')
 
 class DailyCog(commands.Cog):
     def __init__(self, bot):
@@ -22,29 +25,31 @@ class DailyCog(commands.Cog):
     
     @tasks.loop(time=leetcode_time)
     async def leetcode_daily(self):
-        channel = self.bot.get_channel(LEETCODE_CHANNEL)
+        channelid = int(LEETCODE_CHANNEL)
+        channel = self.bot.get_channel(channelid)
         if channel:
             herf_daily = bot_related_functions.get_daily_leetcode_screenshot()
-            await channel.send(herf_daily)
+            await channel.send(herf_daily, suppress_embeds=True)
             await channel.send(file=discord.File('daily.png'))
-            print(f"Channel with ID {LEETCODE_CHANNEL} has been sent daily challenge")
+            print(f"Channel with ID {channelid} has been sent daily challenge")
         else:
-            print(f"Channel with ID {LEETCODE_CHANNEL} not found.")
+            print(f"Channel with ID {channelid} not found.")
             
     @tasks.loop(time=coop_time)
     async def coop_weekends_notice(self):
+        channelid = int(GENERAL_CHANNEL)
+        channel = self.bot.get_channel(channelid)
+        
         if datetime.datetime.now().weekday() < 5:
             return
         
         members = bot_related_functions.members_to_notify()
-        channel = self.bot.get_channel(GENERAL_CHANNEL)
         
-        if channel:
-            notify_message = "It's time to Co-op "
-            for i in members:
-                notify_message += "<@" + str(i) + "> "
-            await channel.send(notify_message)
-            print("Notified")
-        else:
+        if not channel:
             print("Coop channel to notify doesn't exist")
-        
+
+        notify_message = "It's time to Co-op "
+        for i in members:
+            notify_message += "<@" + str(i) + "> "
+        await channel.send(notify_message)
+        print("Notified")

@@ -1,5 +1,16 @@
 import datetime
 import browse_web
+import re
+from bson import ObjectId
+from pymongo import MongoClient, ReturnDocument
+import os
+from dotenv import load_dotenv
+
+
+load_dotenv()
+MONGODB_USER = os.getenv('MONGODB_USER')
+MONGODB_PASS = os.getenv('MONGODB_PASS')
+
 
 def new_day():
     file_date = 0
@@ -89,3 +100,142 @@ def get_notify_channel(channel: int):
     except FileNotFoundError:
         print("No such file to notify")
     return id
+
+
+def connect_to_coop_database():
+    # Database here
+    uri = "mongodb+srv://"+MONGODB_USER+":"+MONGODB_PASS+"@cluster0.aib2ley.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+    
+    client = MongoClient(uri)
+    
+    collection = client['coop_proposal']['proposal']
+    return collection
+
+def is_steam_store_link(link):
+    pattern = re.compile(
+        r'^https?://store\.steampowered\.com/(app|bundle|sub)/\d+/?',
+        re.IGNORECASE
+    )
+    
+    if bool(pattern.match(link)):
+        return True
+    
+    return False
+
+def add_to_coop_proposal_database(message):    
+    if not is_steam_store_link(message.content):
+        return
+
+    # Grab info from Steam link
+    message_link = message.content.split('\n', 1)[0]
+    message_name = message.content.split('/')[-2]
+
+    collection = connect_to_coop_database()
+    
+    # Find the entry, increment count by 1
+    # else Insert
+    find_link = collection.find_one_and_update(
+        {"name": message_name},
+        {"$inc": {"suggested": 1}},
+        return_document=ReturnDocument.AFTER
+    )
+    
+    if find_link:
+        return
+    
+    # Insert
+    single = {
+        "name": message_name,
+        "link": message_link,
+        "author": message.author.name,
+        "date": message.created_at,
+        "suggested": 1,
+        "agreed": False,
+    }
+    
+    collection.insert_one(single)
+    
+# This is for both when entering a link
+# Or when called by a function
+def find_coop_proposal_entry(title):
+    find_title = ""
+    criteria = ""
+    if is_steam_store_link(title):
+        find_title = title.split('\n', 1)[0]
+        criteria = "link"
+    else:
+        find_title = title
+        criteria = "name"
+    
+    collection = connect_to_coop_database()
+        
+    results = collection.find(
+        {criteria: find_title}
+    )
+    
+    return list(results)
+
+def show_coop_proposal_entry(game):
+    results = find_coop_proposal_entry(game)
+    if not results:
+        return "Can't find the game!"
+    
+    response = ""
+    for res in results:
+        name = res["name"] + "\n"
+        link = res["link"] + "\n"
+        suggested_by = "Suggested by: " + res["author"] + "\n"
+        suggested_times = "Suggested time: " + str(res["suggested"]) + "\n"
+        agreed = "Agreed? " + str(res["agreed"]) + "\n"
+        seperator = "--------------------------------------" + "\n"
+        response += name + link + suggested_by + suggested_times + agreed + seperator
+    
+    return response
+
+def show_all_coop_proposal_entry():
+    collection = connect_to_coop_database()
+    results = collection.find()
+    response = "```\n"
+    
+    for res in results:
+        name = res["name"] + " | "
+        suggested_times = "Suggested: " + str(res["suggested"]) + " | "
+        agreed = "Agreed? " + str(res["agreed"]) + "\n"
+        response += name + suggested_times + agreed
+    response += "```"
+    
+    return response
+
+def show_all_agreed_coop_proposal(agreed):
+    collection = connect_to_coop_database()
+    results = collection.find(
+        {"agreed": agreed}
+    )
+    response = "```\n"
+    
+    for res in results:
+        name = res["name"] + " | "
+        suggested_times = "Suggested: " + str(res["suggested"]) + " | "
+        agreed = "Agreed? " + str(res["agreed"]) + "\n"
+        response += name + suggested_times + agreed
+    response += "```"
+    
+    return response
+    
+
+def delete_coop_proposal_entry(game):
+    collection = connect_to_coop_database()
+    result = collection.delete_one(
+        {"link": game}
+    )
+    return result.deleted_count > 0
+
+def change_agreed_state_coop_proposal_entry(game:bool):
+    collection = connect_to_coop_database()
+    # Reverse the value of agreed field
+    result = collection.update_one(
+        {"link": game},
+        {"$set": {"agreed": {"$not": "$agreed"}}}
+    )
+    
+    return result.modified_count > 0
